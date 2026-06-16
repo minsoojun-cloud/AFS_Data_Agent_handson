@@ -36,27 +36,28 @@ resource "google_project_service" "enabled_apis" {
 }
 
 # Create the BigQuery Dataset
-# resource "google_bigquery_dataset" "ga_dataset" {
-#   dataset_id                  = "google_analytics_sample"
-#   friendly_name               = "Google Analytics Sample (Linked)"
-#   description                 = "Dataset containing views linked to the bigquery-public-data Google Analytics sample tables"
-#   location                    = "US"
-#   project                     = var.gcp_project_id
-# 
-#   depends_on = [google_project_service.enabled_apis]
-# }
-# 
-# # Create the view linking to the public dataset table
-# resource "google_bigquery_table" "ga_sessions_20170801" {
-#   dataset_id          = google_bigquery_dataset.ga_dataset.dataset_id
-#   table_id            = "ga_sessions_20170801"
-#   project             = var.gcp_project_id
-#   deletion_protection = false
-# 
-#   view {
-#     query          = "SELECT * FROM `bigquery-public-data.google_analytics_sample.ga_sessions_20170801`"
-#     use_legacy_sql = false
-#   }
-# 
-#   depends_on = [google_bigquery_dataset.ga_dataset]
-# }
+resource "google_bigquery_dataset" "ga_dataset" {
+  dataset_id                  = "google_analytics_sample"
+  friendly_name               = "Google Analytics Sample (Linked)"
+  description                 = "Dataset containing views linked to the bigquery-public-data Google Analytics sample tables"
+  location                    = "US"
+  project                     = var.gcp_project_id
+
+  depends_on = [google_project_service.enabled_apis]
+}
+
+# Create the view linking to the public dataset table
+resource "google_bigquery_table" "ga_sessions_20170801" {
+  dataset_id          = google_bigquery_dataset.ga_dataset.dataset_id
+  table_id            = "ga_sessions_20170801"
+  project             = var.gcp_project_id
+  deletion_protection = false
+
+  view {
+    query          = "SELECT * FROM `bigquery-public-data.google_analytics_sample.ga_sessions_20170801`"
+    use_legacy_sql = false
+  }
+
+  depends_on = [google_bigquery_dataset.ga_dataset]
+}
+
