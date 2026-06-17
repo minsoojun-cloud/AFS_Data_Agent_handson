@@ -1,7 +1,13 @@
 # Task 1
 1. API有効化 : OK
 2. BigQuery Public Dataset link : OK
-TF_VAR_project_id와 TF_VAR_region
+## qwiklab 環境変数設定
+| Property | Reference / Value | Type |
+| :--- | :--- | :--- |
+| `gcp_project_id` | `project_0.project_id` | reference |
+| `gcp_region` | `project_0.default_region` | reference |
+| `gcp_zone` | `project_0.default_zone` | reference |
+
 # Task 2
 1. BigQueryでAgent作成 (Terramform　未サポートのためUIで作成)
   1-1. BigQuery -> Agents -> Conversations -> New Agent

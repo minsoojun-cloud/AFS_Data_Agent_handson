@@ -5,6 +5,10 @@ terraform {
       source  = "hashicorp/google"
       version = "~> 5.0"
     }
+    google-beta = {
+      source  = "hashicorp/google-beta"
+      version = "~> 5.0"
+    }
   }
 }
 
@@ -12,6 +16,12 @@ provider "google" {
   project = var.gcp_project_id
   region  = var.gcp_region
 }
+
+provider "google-beta" {
+  project = var.gcp_project_id
+  region  = var.gcp_region
+}
+
 
 # Define all necessary APIs to enable
 locals {
@@ -22,10 +32,12 @@ locals {
     "aiplatform.googleapis.com",
     "bigqueryconnection.googleapis.com",
     "connectors.googleapis.com",
-    "geminidataanalytics.googleapis.com",
-    "cloudaicompanion.googleapis.com"
+    "dataplex.googleapis.com"
   ]
 }
+
+
+
 
 # Enable APIs in a loop
 resource "google_project_service" "enabled_apis" {
@@ -60,4 +72,14 @@ resource "google_bigquery_table" "ga_sessions_20170801" {
 
   depends_on = [google_bigquery_dataset.ga_dataset]
 }
+
+
+
+
+
+
+
+
+
+
 

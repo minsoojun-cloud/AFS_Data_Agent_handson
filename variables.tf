@@ -14,3 +14,10 @@ variable "gcp_zone" {
   default     = ""
   description = "The zone for GCP resources automatically passed by Qwiklabs"
 }
+
+variable "gcp_user_email" {
+  type        = string
+  default     = ""
+  description = "The Qwiklabs student email address to grant Gemini permissions to"
+}
+
