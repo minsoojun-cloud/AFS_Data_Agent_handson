@@ -12,7 +12,6 @@ terraform {
   }
 }
 
-
 provider "google" {
   project = var.gcp_project_id
   region  = var.gcp_region
@@ -33,12 +32,10 @@ locals {
     "aiplatform.googleapis.com",
     "bigqueryconnection.googleapis.com",
     "connectors.googleapis.com",
-    "dataplex.googleapis.com"
+    "geminidataanalytics.googleapis.com",
+    "cloudaicompanion.googleapis.com"
   ]
 }
-
-
-
 
 
 
@@ -77,61 +74,6 @@ resource "google_bigquery_table" "ga_sessions_20170801" {
 
   depends_on = [google_bigquery_dataset.ga_dataset]
 }
-
-# Force creation of Dialogflow Service Identity
-resource "google_project_service_identity" "dialogflow_sa" {
-  provider = google-beta
-  project  = var.gcp_project_id
-  service  = "dialogflow.googleapis.com"
-
-  depends_on = [google_project_service.enabled_apis]
-}
-
-# Force creation of Discovery Engine Service Identity
-resource "google_project_service_identity" "discoveryengine_sa" {
-  provider = google-beta
-  project  = var.gcp_project_id
-  service  = "discoveryengine.googleapis.com"
-
-  depends_on = [google_project_service.enabled_apis]
-}
-
-# Force creation of Dataplex Service Identity
-resource "google_project_service_identity" "dataplex_sa" {
-  provider = google-beta
-  project  = var.gcp_project_id
-  service  = "dataplex.googleapis.com"
-
-  depends_on = [google_project_service.enabled_apis]
-}
-
-# Grant BigQuery Admin permission to Dialogflow Service Agent (required for Agent tool query execution)
-resource "google_project_iam_member" "dialogflow_bq_admin" {
-  project = var.gcp_project_id
-  role    = "roles/bigquery.admin"
-  member  = "serviceAccount:${google_project_service_identity.dialogflow_sa.email}"
-
-  depends_on = [google_project_service.enabled_apis]
-}
-
-# Grant BigQuery Admin permission to Discovery Engine Service Agent (required for Agent tool query execution)
-resource "google_project_iam_member" "discoveryengine_bq_admin" {
-  project = var.gcp_project_id
-  role    = "roles/bigquery.admin"
-  member  = "serviceAccount:${google_project_service_identity.discoveryengine_sa.email}"
-
-  depends_on = [google_project_service.enabled_apis]
-}
-
-# Grant BigQuery Admin permission to Dataplex Service Agent (required for metadata indexing and search)
-resource "google_project_iam_member" "dataplex_bq_admin" {
-  project = var.gcp_project_id
-  role    = "roles/bigquery.admin"
-  member  = "serviceAccount:${google_project_service_identity.dataplex_sa.email}"
-
-  depends_on = [google_project_service.enabled_apis]
-}
-
 
 
 
