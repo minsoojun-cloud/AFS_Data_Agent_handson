@@ -9,6 +9,10 @@ terraform {
       source  = "hashicorp/google-beta"
       version = "~> 5.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.0"
+    }
   }
 }
 
@@ -26,14 +30,7 @@ provider "google-beta" {
 # Define all necessary APIs to enable
 locals {
   apis = [
-    "bigquery.googleapis.com",
-    "dialogflow.googleapis.com",
-    "discoveryengine.googleapis.com",
-    "aiplatform.googleapis.com",
-    "bigqueryconnection.googleapis.com",
-    "connectors.googleapis.com",
-    "geminidataanalytics.googleapis.com",
-    "cloudaicompanion.googleapis.com"
+    "bigquery.googleapis.com"
   ]
 }
 
@@ -60,15 +57,19 @@ resource "google_bigquery_dataset" "ga_dataset" {
   depends_on = [google_project_service.enabled_apis]
 }
 
-# Create the view linking to the public dataset table
-resource "google_bigquery_table" "ga_sessions_20170801" {
-  dataset_id          = google_bigquery_dataset.ga_dataset.dataset_id
-  table_id            = "ga_sessions_20170801"
-  project             = var.gcp_project_id
-  deletion_protection = false
+resource "random_id" "job_suffix" {
+  byte_length = 8
+}
 
-  view {
-    query          = "SELECT * FROM `bigquery-public-data.google_analytics_sample.ga_sessions_20170801`"
+# Create a physical table by copying the public dataset table (prevents Dataplex view indexing errors)
+resource "google_bigquery_job" "ga_sessions_20170801_copy" {
+  job_id   = "copy_ga_sessions_table_${random_id.job_suffix.hex}"
+  project  = var.gcp_project_id
+  location = "US"
+
+  query {
+    query = "CREATE OR REPLACE TABLE `${var.gcp_project_id}.${google_bigquery_dataset.ga_dataset.dataset_id}.ga_sessions_20170801` AS SELECT * FROM `bigquery-public-data.google_analytics_sample.ga_sessions_20170801`"
+    
     use_legacy_sql = false
   }
 
